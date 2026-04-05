@@ -1,0 +1,40 @@
+/* Reset */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Map fills everything */
+#map {
+  height: 95%;
+  width: 100%;
+}
+
+.coords-control {
+  background: rgba(30, 30, 30, 0.9);
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+header {
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header h1 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+header span {
+    font-size: 13px;
+    color: #64748b;
+}
