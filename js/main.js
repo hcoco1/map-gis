@@ -84,9 +84,9 @@ pointToLayer: (feature, latlng) => {
   // ADD THIS BLOCK right after line 57:
   const licensesLayer = L.geoJSON(null, {
     style: {
-      color: '#16a34a',      // green border
+      color: '#616161',      // green border
       weight: 1,
-      fillColor: '#bbf7d0',  // light green fill
+      fillColor: '#dafae5',  // light green fill
       fillOpacity: 0.3,
     },
     onEachFeature: (feature, layer) => {
@@ -112,11 +112,11 @@ pointToLayer: (feature, latlng) => {
   // CONTROLS
   // ============================
 
-  const overlayMaps = {
-    "Boreholes": boreholesLayer,
-    "Pipelines": pipelinesLayer,
-    "Licenses": licensesLayer,
-  };
+const overlayMaps = {
+  "<i class='fas fa-bore-hole'></i> Boreholes": boreholesLayer,
+  "<i class='fas fa-route'></i> Pipelines": pipelinesLayer,
+  "<i class='fas fa-file-contract'></i> Licenses": licensesLayer,
+};
   addLayerControl(map, baseMaps, overlayMaps);
 
   const coordsControl = createCoordsControl().addTo(map);
