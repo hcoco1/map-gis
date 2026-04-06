@@ -113,9 +113,9 @@ pointToLayer: (feature, latlng) => {
   // ============================
 
 const overlayMaps = {
-  "<i class='fas fa-bore-hole'></i> Boreholes": boreholesLayer,
-  "<i class='fas fa-route'></i> Pipelines": pipelinesLayer,
-  "<i class='fas fa-file-contract'></i> Licenses": licensesLayer,
+  "<i class='fa-solid fa-circle' style='color: #070707;'></i> Boreholes": boreholesLayer,
+  "<i class='fas fa-route' style='color: #ff01c8ee;'></i> Pipelines": pipelinesLayer,
+  "<i class='fas fa-file-contract' style='color: #dafae5;'></i> Licenses": licensesLayer,
 };
   addLayerControl(map, baseMaps, overlayMaps);
 
