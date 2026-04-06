@@ -15,15 +15,26 @@ const map = createMap();
 const boreholesLayer = L.geoJSON(null, {
   pointToLayer: (feature, latlng) =>
     L.circleMarker(latlng, {
-      radius: 3,
-      color: '#2563eb'
-    })
+      radius: 4,
+      color: '#2563eb',
+      fillOpacity: 0.6
+    }),
+
+  onEachFeature: (feature, layer) => {
+    layer.bindPopup(`
+      <b>${feature.properties.name || "No name"}</b><br>
+      Year: ${feature.properties.year || "N/A"}<br>
+      Status: ${feature.properties.status || "Unknown"}
+    `);
+  }
+
 }).addTo(map);
 
 const pipelinesLayer = L.geoJSON(null, {
   style: {
-    color: 'red',
-    weight: 2
+    color: '#db8c8cee',
+    weight: 1,
+    fillOpacity: 0.6,
   }
 }).addTo(map);
 
@@ -43,15 +54,42 @@ map.on('mousemove', (e) => {
   coordsControl.getContainer().innerHTML =
     `Lat: ${e.latlng.lat.toFixed(5)} | Lng: ${e.latlng.lng.toFixed(5)}`;
 });
+//===========================
+//bbox caching
+//============================
+
+let lastBBox = null;
+
+function getBBoxKey(map) {
+  const b = map.getBounds();
+  return [
+    b.getWest().toFixed(2),
+    b.getSouth().toFixed(2),
+    b.getEast().toFixed(2),
+    b.getNorth().toFixed(2)
+  ].join(',');
+}
+
 
 // ============================
 // DATA FETCH
 // ============================
+let requestId = 0;
 async function updateData() {
+  const id = ++requestId;
+
   const zoom = map.getZoom();
+  const bboxKey = getBBoxKey(map);
+  if (bboxKey === lastBBox) {
+    console.log("⏸️ same bbox → skip");
+    return;
+  }
+
+  lastBBox = bboxKey;
 
   // Boreholes (always)
   const boreholes = await getBoreholes(map);
+  if (id !== requestId) return; // cancel old request
   if (boreholes) {
     boreholesLayer.clearLayers();
     boreholesLayer.addData(boreholes);
