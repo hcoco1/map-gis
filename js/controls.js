@@ -1,11 +1,4 @@
 
-
-export function addLayerControl(map, baseMaps, overlays) {
-  L.control.layers(baseMaps, overlays).addTo(map);
-}
-
-
-
 //=============================
 // COORDS CONTROL
 //=============================
@@ -26,4 +19,9 @@ export function createCoordsControl() {
   });
 
   return new CoordsControl();
+}
+
+// In controls.js — find your addLayerControl function and update it:
+export function addLayerControl(map, baseMaps, overlayMaps = {}) {
+  L.control.layers(baseMaps, overlayMaps).addTo(map);
 }

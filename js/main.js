@@ -2,7 +2,7 @@ import { createMap } from './map.js';
 import { getBaseMaps } from './basemaps.js';
 import { addLayerControl } from './controls.js';
 import { createCoordsControl } from './controls.js';
-import { getBoreholes, getPipelines } from './api.js';
+import { getBoreholes, getPipelines, getLicenses }from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -56,6 +56,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }).addTo(map);
 
+    // ADD THIS BLOCK right after line 57:
+  const licensesLayer = L.geoJSON(null, {
+    style: {
+      color: '#16a34a',      // green border
+      weight: 1,
+      fillColor: '#bbf7d0',  // light green fill
+      fillOpacity: 0.3,
+    },
+    onEachFeature: (feature, layer) => {
+      layer.bindPopup(`
+        <div style="font-size:13px">
+          <b>${feature.properties.name || "No name"}</b><br>
+          <hr style="margin:4px 0;">
+          <b>License:</b> ${feature.properties.license || "N/A"}<br>
+          <b>Status:</b> ${feature.properties.status || "Unknown"}
+        </div>
+      `);
+    }
+  }).addTo(map);
+
   // ============================
   // BASEMAPS
   // ============================
@@ -67,7 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // CONTROLS
   // ============================
 
-  addLayerControl(map, baseMaps);
+  const overlayMaps = {
+    "Boreholes":  boreholesLayer,
+    "Pipelines":  pipelinesLayer,
+    "Licenses":   licensesLayer,
+  };
+  addLayerControl(map, baseMaps, overlayMaps);
 
   const coordsControl = createCoordsControl().addTo(map);
   map.on('mousemove', (e) => {
@@ -96,7 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // DATA FETCH
   // ============================
 
-  const PIPELINE_MIN_ZOOM = 8; // named constant — change here if you need a different zoom threshold
+  const PIPELINE_MIN_ZOOM = 8; // named constant — change here fora different zoom threshold
+  const LICENSE_MIN_ZOOM  = 7; 
 
   let requestId = 0;
 
@@ -149,9 +175,31 @@ document.addEventListener('DOMContentLoaded', () => {
       pipelinesLayer.clearLayers();
     }
 
+        // ADD THIS BLOCK right after line 150:
+    // --- Licenses (polygons, shown from zoom 7+) ---
+    if (zoom >= LICENSE_MIN_ZOOM) {
+      const licenses = await getLicenses(map);
+
+      if (id !== requestId) {
+        // stale response — a newer request arrived, discard this
+        document.getElementById('loadingIndicator').style.display = 'none';
+        return;
+      }
+
+      if (licenses?.features?.length) {
+        licensesLayer.clearLayers();
+        licensesLayer.addData(licenses);
+      }
+    } else {
+      licensesLayer.clearLayers(); // hide when zoomed out too far
+    }
+
+
+
+
     // --- Update info panel ---
     document.getElementById('uiStatus').textContent = currentStatus || "All";
-    document.getElementById('uiZoom').textContent   = map.getZoom();
+    //document.getElementById('uiZoom').textContent   = map.getZoom();
     document.getElementById('uiCount').textContent  = boreholes?.features?.length || 0;
 
     document.getElementById('loadingIndicator').style.display = 'none'; // hide loader when done
