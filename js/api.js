@@ -40,10 +40,14 @@ export function buildBBoxParams(map) {
 
 // Boreholes (points)
 export async function getBoreholes(map, filters = {}) {
-  const params = {
-    ...buildBBoxParams(map),
-    ...filters
-  };
+const params = {
+  ...buildBBoxParams(map)
+};
+
+// only add status if it has value
+if (filters.status) {
+  params.status = filters.status;
+}
 
   const query = new URLSearchParams(params).toString();
 
@@ -54,7 +58,6 @@ export async function getBoreholes(map, filters = {}) {
 export async function getPipelines(map) {
   const params = buildBBoxParams(map);
   const query = toQuery(params);
-  console.log("BBOX SENT:", params);
   return request(`${BASE}/pipelines?${query}`);
 }
 

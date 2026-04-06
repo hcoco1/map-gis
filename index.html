@@ -9,9 +9,10 @@
 <!-- Leaflet JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-<!-- Leaflet Marker Cluster -->
+<!-- Leaflet Marker Cluster 
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+  -->
 
 <!-- local CSS-->
   <link rel="stylesheet" href="/css/style.css" />
@@ -42,12 +43,36 @@
 </header>
 
 
-<select id="statusFilter">
-  <option value="">All</option>
-  <option value="Active">Active</option>
-  <option value="Abandoned">Abandoned</option>
-  <option value="Suspended">Suspended</option>
-</select>
+<div id="controlPanel">
+
+  <div class="panel-row">
+    <label>Status:</label>
+    <select id="statusFilter">
+      <option value="">All</option>
+      <option value="Active">Active</option>
+      <option value="Abandoned">Abandoned</option>
+      <option value="Suspended">Suspended</option>
+    </select>
+  </div>
+
+  <div class="panel-row">
+    <b>Status:</b> <span id="uiStatus">All</span>
+  </div>
+
+  <div class="panel-row">
+    <b>Zoom:</b> <span id="uiZoom">-</span>
+  </div>
+
+  <div class="panel-row">
+    <b>Features:</b> <span id="uiCount">-</span>
+  </div>
+
+  <!-- 👇 NEW -->
+  <div id="loadingIndicator">Loading...</div>
+
+</div>
+
+
 <div id="map"></div>
 
 
