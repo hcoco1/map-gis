@@ -4,10 +4,21 @@ import { addLayerControl } from './controls.js';
 import { createCoordsControl } from './controls.js';
 import { getBoreholes, getPipelines } from './api.js';
 
+console.log("SELECT:", document.getElementById('statusFilter'));
 // ============================
 // INIT MAP
 // ============================
 const map = createMap();
+const statusSelect = document.getElementById('statusFilter');
+let currentStatus = '';
+
+statusSelect.addEventListener('change', () => {
+  currentStatus = statusSelect.value;
+  console.log("Filter changed:", currentStatus);
+  updateData();
+});
+
+
 
 // ============================
 // DATA LAYERS (created once)
@@ -22,10 +33,20 @@ const boreholesLayer = L.geoJSON(null, {
 
   onEachFeature: (feature, layer) => {
     layer.bindPopup(`
-      <b>${feature.properties.name || "No name"}</b><br>
-      Year: ${feature.properties.year || "N/A"}<br>
-      Status: ${feature.properties.status || "Unknown"}
-    `);
+  <div style="font-size:13px">
+    <b>${feature.properties.name || "No name"}</b><br>
+    <hr style="margin:4px 0;">
+    <b>Year:</b> ${feature.properties.year || "N/A"}<br>
+    <b>Status:</b> ${feature.properties.status || "Unknown"}
+  </div>
+`);
+      layer.on('mouseover', () => {
+    layer.setStyle({ radius: 6 });
+  });
+
+  layer.on('mouseout', () => {
+    layer.setStyle({ radius: 4 });
+  });
   }
 
 }).addTo(map);
@@ -88,7 +109,9 @@ async function updateData() {
   lastBBox = bboxKey;
 
   // Boreholes (always)
-  const boreholes = await getBoreholes(map);
+  const boreholes = await getBoreholes(map, {
+  status: currentStatus
+});
   if (id !== requestId) return; // cancel old request
   if (boreholes) {
     boreholesLayer.clearLayers();
@@ -123,4 +146,15 @@ map.whenReady(() => {
 map.on('moveend', () => {
   clearTimeout(timeout);
   timeout = setTimeout(updateData, 200);
+});
+
+// ============================
+// Capture filter in frontend
+// ============================
+
+
+
+statusSelect.addEventListener('change', () => {
+  currentStatus = statusSelect.value;
+  updateData();  // reload map with filter
 });

@@ -39,10 +39,13 @@ export function buildBBoxParams(map) {
 // ============================
 
 // Boreholes (points)
-export async function getBoreholes(map) {
-  const params = buildBBoxParams(map);
-  const query = toQuery(params);
+export async function getBoreholes(map, filters = {}) {
+  const params = {
+    ...buildBBoxParams(map),
+    ...filters
+  };
 
+  const query = new URLSearchParams(params).toString();
 
   return request(`${BASE}/boreholes?${query}`);
 }
