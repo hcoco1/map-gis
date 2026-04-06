@@ -2,7 +2,7 @@ import { createMap } from './map.js';
 import { getBaseMaps } from './basemaps.js';
 import { addLayerControl } from './controls.js';
 import { createCoordsControl } from './controls.js';
-import { getBoreholes, getPipelines, getLicenses }from './api.js';
+import { getBoreholes, getPipelines, getLicenses } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================
 
   const map = createMap();
+
+
+
   const statusSelect = document.getElementById('statusFilter');
   let currentStatus = '';
 
@@ -26,12 +29,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================
 
   const boreholesLayer = L.geoJSON(null, {
-    pointToLayer: (feature, latlng) =>
-      L.circleMarker(latlng, {
-        radius: 4,
-        color: '#2563eb',
-        fillOpacity: 0.6
-      }),
+pointToLayer: (feature, latlng) => {
+
+  const status = feature.properties.status;
+
+  let color = '#2563eb'; // default (blue)
+  let radius = 4;
+
+  if (status === "Active") {
+    color = '#16a34a'; // green
+    radius = 5;
+  } else if (status === "Abandoned") {
+    color = '#d46868'; // red
+    radius = 3;
+  } else if (status === "Suspended") {
+    color = '#f59e0b'; // orange
+  }
+
+  return L.circleMarker(latlng, {
+    radius: radius,
+    color: color,
+    fillColor: color,
+    fillOpacity: 0.7
+  });
+},
 
     onEachFeature: (feature, layer) => {
       layer.bindPopup(`
@@ -43,20 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 `);
       layer.on('mouseover', () => layer.setStyle({ radius: 6 }));
-      layer.on('mouseout',  () => layer.setStyle({ radius: 4 }));
+      layer.on('mouseout', () => layer.setStyle({ radius: 4 }));
     }
 
   }).addTo(map);
 
+  if (!map.hasLayer(boreholesLayer)) {
+    boreholesControls.style.display = 'none';
+  }
+
   const pipelinesLayer = L.geoJSON(null, {
     style: {
-      color: '#db8c8cee',
+      color: '#ff01c8ee',
       weight: 1,
       fillOpacity: 0.6,
     }
   }).addTo(map);
 
-    // ADD THIS BLOCK right after line 57:
+  // ADD THIS BLOCK right after line 57:
   const licensesLayer = L.geoJSON(null, {
     style: {
       color: '#16a34a',      // green border
@@ -88,9 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================
 
   const overlayMaps = {
-    "Boreholes":  boreholesLayer,
-    "Pipelines":  pipelinesLayer,
-    "Licenses":   licensesLayer,
+    "Boreholes": boreholesLayer,
+    "Pipelines": pipelinesLayer,
+    "Licenses": licensesLayer,
   };
   addLayerControl(map, baseMaps, overlayMaps);
 
@@ -122,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================
 
   const PIPELINE_MIN_ZOOM = 8; // named constant — change here fora different zoom threshold
-  const LICENSE_MIN_ZOOM  = 7; 
+  const LICENSE_MIN_ZOOM = 7;
 
   let requestId = 0;
 
@@ -175,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pipelinesLayer.clearLayers();
     }
 
-        // ADD THIS BLOCK right after line 150:
+    // ADD THIS BLOCK right after line 150:
     // --- Licenses (polygons, shown from zoom 7+) ---
     if (zoom >= LICENSE_MIN_ZOOM) {
       const licenses = await getLicenses(map);
@@ -198,12 +223,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Update info panel ---
-    document.getElementById('uiStatus').textContent = currentStatus || "All";
+
+  const statusEl = document.getElementById('uiStatus');
+
+  statusEl.textContent = currentStatus || "All";
+
+  if (currentStatus === "Active") {
+    statusEl.style.color = "#16a34a"; // green
+  } else if (currentStatus === "Abandoned") {
+    statusEl.style.color = "#dc2626"; // red
+  } else if (currentStatus === "Suspended") {
+    statusEl.style.color = "#f59e0b"; // orange
+  } else {
+    statusEl.style.color = "#000";
+  }
     //document.getElementById('uiZoom').textContent   = map.getZoom();
-    document.getElementById('uiCount').textContent  = boreholes?.features?.length || 0;
+    document.getElementById('uiCount').textContent = boreholes?.features?.length || 0;
 
     document.getElementById('loadingIndicator').style.display = 'none'; // hide loader when done
   }
+
 
   // ============================
   // EVENTS
@@ -220,5 +259,24 @@ document.addEventListener('DOMContentLoaded', () => {
     clearTimeout(timeout);
     timeout = setTimeout(updateData, 200);
   });
+
+
+  const boreholesControls = document.getElementById('boreholesControls');
+
+  // when layer is turned ON
+  map.on('overlayadd', (e) => {
+    if (e.layer === boreholesLayer) {
+      boreholesControls.style.display = 'block';
+    }
+  });
+
+  // when layer is turned OFF
+  map.on('overlayremove', (e) => {
+    if (e.layer === boreholesLayer) {
+      boreholesControls.style.display = 'none';
+    }
+  });
+
+  
 
 });

@@ -1,37 +1,46 @@
-/* Reset */
+/* =========================
+   🔧 RESET & BASE
+========================= */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* Map fills everything */
+/* =========================
+   🗺️ MAP
+========================= */
 #map {
   height: 95%;
   width: 100%;
 }
 
+/* =========================
+   📍 MAP CONTROLS
+========================= */
 .coords-control {
   background: rgba(30, 30, 30, 0.9);
-  color: white;
+  color: #fff;
   padding: 6px 10px;
   font-size: 12px;
   border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* HEADER LAYOUT */
+/* =========================
+   🧭 HEADER
+========================= */
 header {
-  padding: 10px 16px;
-  background: #fff;
-  border-bottom: 1px solid #e2e8f0;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* LEFT */
+/* Header Left */
 .header-left {
   display: flex;
   align-items: center;
@@ -39,8 +48,8 @@ header {
 }
 
 .header-left i {
-  color: #2563eb;
   font-size: 20px;
+  color: #2563eb;
 }
 
 header h1 {
@@ -48,14 +57,13 @@ header h1 {
   font-weight: 600;
 }
 
-/* RIGHT */
+/* Header Right */
 .header-right {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-/* ICONS (bigger) */
 .header-right i {
   font-size: 22px;
   color: #2563eb;
@@ -66,7 +74,6 @@ header h1 {
   transform: scale(1.2);
 }
 
-/* PROFILE IMAGE (bigger) */
 .header-right img {
   width: 42px;
   height: 42px;
@@ -75,35 +82,80 @@ header h1 {
   border: 2px solid #e2e8f0;
 }
 
+/* =========================
+   🎛️ CONTROL PANEL
+========================= */
 #controlPanel {
   position: absolute;
-  top: 160px;
+  bottom: 10px;   /* ⬅️ anchor to bottom instead of top */
   right: 10px;
-  background: white;
+
+  min-width: 50px;
   padding: 12px;
-  border-radius: 8px;
+
+  background: #fff;
+  border-radius: 10px;
   font-size: 13px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  min-width: 180px;
 }
 
+/* Panel Layout */
+.panel-section,
 .panel-row {
-  margin-bottom: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
 }
 
+.panel-section:last-child,
+.panel-row:last-child {
+  border-bottom: none;
+}
+
+/* Inputs */
 #statusFilter {
   font-size: 12px;
 }
 
+/* Loading Indicator */
 #loadingIndicator {
+  display: none;
   margin-top: 6px;
+
   font-size: 12px;
   color: #2563eb;
-  display: none; /* hidden by default */
+}
+
+/* Icons inside panel */
+#controlPanel i {
+  margin-right: 6px;
+  color: #2563eb;
+}
+
+/* Spinner animation */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 /* =========================
@@ -116,39 +168,36 @@ header h1 {
     font-size: 14px;
   }
 
+  .header-right i {
+    font-size: 20px;
+  }
+
   .header-right img {
     width: 36px;
     height: 36px;
-  }
-
-  .header-right i {
-    font-size: 20px;
   }
 }
 
 /* Mobile */
 @media (max-width: 480px) {
-  
   header {
     padding: 8px;
   }
 
-  /* Hide title (too long) */
-  header h1 {
+/*   header h1 {
     display: none;
-  }
+  } */
 
-  /* Reduce spacing */
   .header-right {
     gap: 10px;
+  }
+
+  .header-right i {
+    font-size: 18px;
   }
 
   .header-right img {
     width: 32px;
     height: 32px;
-  }
-
-  .header-right i {
-    font-size: 18px;
   }
 }

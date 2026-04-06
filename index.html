@@ -24,7 +24,7 @@
 <header>
   <div class="header-left">
     <i class="fa-solid fa-map-location-dot"></i>
-    <h1>Boreholes – Pipelines &amp; Active Licenses</h1>
+    <h1>Netherland – Oil &amp; Gas Boreholes</h1>
   </div>
 
   <div class="header-right">
@@ -45,30 +45,65 @@
 
 <div id="controlPanel">
 
-  <div class="panel-row">
-    <label>Boreholes</label>
-    <select id="statusFilter">
-      <option value="">All</option>
-      <option value="Active">Active</option>
-      <option value="Abandoned">Abandoned</option>
-      <option value="Suspended">Suspended</option>
-    </select>
+  <div id="boreholesControls">
+<b>Filter Boreholes</b> 
+    <div class="panel-row">
+      <label>By:</label>
+      <select id="statusFilter">
+        <option value="">Click Here</option>
+        <option value="Active">Active</option>
+        <option value="Abandoned">Abandoned</option>
+        <option value="Suspended">Suspended</option>
+      </select>
+    </div>
+
+    <div class="panel-row">
+      <b>Status:</b> <span id="uiStatus">All</span>
+    </div>
+
+    <div class="panel-row">
+      <b>Quantity:</b> <span id="uiCount">-</span>
+    </div>
+
+    <div class="panel-section">
+
+  <b>Legend</b>
+
+  <div class="legend-item">
+    <span class="legend-color" style="background:#16a34a;"></span>
+    Active
   </div>
 
-  <div class="panel-row">
-    <b>Status:</b> <span id="uiStatus">All</span>
+  <div class="legend-item">
+    <span class="legend-color" style="background:#dc2626;"></span>
+    Abandoned
   </div>
 
-<!--   <div class="panel-row">
-    <b>Zoom:</b> <span id="uiZoom">-</span>
-  </div> -->
-
-  <div class="panel-row">
-    <b>Quantity:</b> <span id="uiCount">-</span>
+  <div class="legend-item">
+    <span class="legend-color" style="background:#f59e0b;"></span>
+    Suspended
   </div>
 
-  <!-- 👇 NEW -->
-  <div id="loadingIndicator">Loading Data...</div>
+  <div class="legend-item">
+    <span class="legend-color" style="background:#2563eb;"></span>
+    Other
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingIndicator"><i class="fa-solid fa-spinner"></i>  Loading...</div>
+
+</div>
+
+
+
+
+
+
+
 
 </div>
 
