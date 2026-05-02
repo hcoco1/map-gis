@@ -1,3 +1,3 @@
 export function createMap() {
-  return L.map('map').setView([53.68, 4.11], 8);
+  return L.map('map').setView([52.16, 4.45], 9);
 }

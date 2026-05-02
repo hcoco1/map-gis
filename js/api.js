@@ -1,23 +1,4 @@
-const BASE = 'https://gis-api-qxok.onrender.com';
-
-// ============================
-// GENERIC REQUEST
-// ============================
-async function request(url) {
-  try {
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-
-    return await res.json();
-
-  } catch (err) {
-    console.error('API error:', err);
-    return null;
-  }
-}
+import { mockGeoDB } from './mockGeoDB.js';
 
 // ============================
 // BBOX BUILDER
@@ -35,45 +16,87 @@ export function buildBBoxParams(map) {
 }
 
 // ============================
-// ENDPOINTS
+// LOCAL DATA QUERIES
 // ============================
 
 // Boreholes (points)
 export async function getBoreholes(map, filters = {}) {
-const params = {
-  ...buildBBoxParams(map)
-};
-
-// only add status if it has value
-if (filters.status) {
-  params.status = filters.status;
-}
-
-  const query = new URLSearchParams(params).toString();
-
-  return request(`${BASE}/boreholes?${query}`);
+  return queryCollection(mockGeoDB.boreholes, map, filters);
 }
 
 // Pipelines (lines)
 export async function getPipelines(map) {
-  const params = buildBBoxParams(map);
-  const query = toQuery(params);
-  return request(`${BASE}/pipelines?${query}`);
+  return queryCollection(mockGeoDB.pipelines, map);
 }
 
 // Licenses (polygons)
 export async function getLicenses(map) {
-  const params = buildBBoxParams(map);
-  const query = toQuery(params);
-
-
-  return request(`${BASE}/licenses?${query}`);
+  return queryCollection(mockGeoDB.active_licenses, map);
 }
 
 // ============================
-// UTILS  Helper to convert params → URL
+// UTILS
 // ============================
 
-function toQuery(params) {
-  return new URLSearchParams(params).toString();
+function queryCollection(collection, map, filters = {}) {
+  const bbox = buildBBoxParams(map);
+  const features = collection.features
+    .filter((feature) => featureIntersectsBBox(feature, bbox))
+    .filter((feature) => matchesFilters(feature, filters));
+
+  return Promise.resolve({
+    ...collection,
+    features
+  });
+}
+
+function matchesFilters(feature, filters) {
+  if (!filters.status) return true;
+
+  return normalize(feature.properties?.status) === normalize(filters.status);
+}
+
+function featureIntersectsBBox(feature, bbox) {
+  const featureBBox = getGeometryBBox(feature.geometry);
+  if (!featureBBox) return false;
+
+  return !(
+    featureBBox.maxx < bbox.minx ||
+    featureBBox.minx > bbox.maxx ||
+    featureBBox.maxy < bbox.miny ||
+    featureBBox.miny > bbox.maxy
+  );
+}
+
+function getGeometryBBox(geometry) {
+  if (!geometry) return null;
+
+  const coordinates = flattenCoordinates(geometry.coordinates);
+  if (!coordinates.length) return null;
+
+  return coordinates.reduce((bbox, [x, y]) => ({
+    minx: Math.min(bbox.minx, x),
+    miny: Math.min(bbox.miny, y),
+    maxx: Math.max(bbox.maxx, x),
+    maxy: Math.max(bbox.maxy, y)
+  }), {
+    minx: Infinity,
+    miny: Infinity,
+    maxx: -Infinity,
+    maxy: -Infinity
+  });
+}
+
+function flattenCoordinates(coordinates) {
+  if (!Array.isArray(coordinates)) return [];
+
+  if (typeof coordinates[0] === 'number') {
+    return [coordinates];
+  }
+
+  return coordinates.flatMap(flattenCoordinates);
+}
+
+function normalize(value) {
+  return String(value).trim().toLowerCase();
 }

@@ -1,12 +1,12 @@
 ## Overview
 
-This project is a **full-stack Web GIS application** designed to visualize and interact with oil & gas infrastructure data, including:
+This project is a **frontend Web GIS application** designed to visualize and interact with local mock oil & gas infrastructure data, including:
 
 * Boreholes (points)
 * Pipelines (lines)
 * Licenses (polygons)
 
-The app is built using **Leaflet (Vanilla JS)** on the frontend and a **FastAPI + PostGIS backend**, enabling real-time spatial queries based on the current map view.
+The app is built using **Leaflet (Vanilla JS)**. It uses a local GeoJSON-style mock database in `js/mockGeoDB.js`, with the former API boundary in `js/api.js` now filtering local data by the current map view.
 
 ---
 
@@ -16,7 +16,7 @@ The app is built using **Leaflet (Vanilla JS)** on the frontend and a **FastAPI 
   Only loads data inside the visible map area (bounding box queries)
 
 * **Dynamic Filtering**
-  Filter boreholes by status (Active, Abandoned, Suspended)
+  Filter boreholes by status (Completed, Drilling, Abandoned)
 
 * **Layer Control**
   Toggle boreholes, pipelines, and licenses using Leaflet controls
@@ -30,9 +30,9 @@ The app is built using **Leaflet (Vanilla JS)** on the frontend and a **FastAPI 
 * **Color-Coded Data Visualization**
   Boreholes styled by status:
 
-  * 🟢 Active
+  * 🟢 Completed
   * 🔴 Abandoned
-  * 🟠 Suspended
+  * 🟠 Drilling
   * 🔵 Other
 
 * **Interactive Popups**
@@ -47,10 +47,10 @@ The app is built using **Leaflet (Vanilla JS)** on the frontend and a **FastAPI 
 
 * **Performance Optimization**
 
-  * Bounding box queries (PostGIS)
+  * Local bounding box filtering
   * Request deduplication
   * Debounced map events
-  * Lightweight GeoJSON streaming
+  * Lightweight GeoJSON rendering
 
 ---
 
@@ -62,28 +62,27 @@ The app is built using **Leaflet (Vanilla JS)** on the frontend and a **FastAPI 
 * Leaflet
 * HTML5 + CSS3
 
-### Backend
+### Data
 
-* FastAPI
-* PostgreSQL + PostGIS
-* Psycopg2 connection pooling
+* Local JavaScript module
+* GeoJSON FeatureCollections
 
 ---
 
 ## How It Works
 
 1. User moves the map
-2. Frontend sends a request with current bounding box
-3. Backend queries PostGIS using `ST_MakeEnvelope`
-4. Filtered GeoJSON is returned
+2. Frontend reads the current bounding box
+3. `js/api.js` filters the local mock FeatureCollections
+4. Filtered GeoJSON is returned through the same async functions
 5. Map updates dynamically
 
 ---
 
-## Example API Request
+## Local Data API
 
-```bash
-/boreholes?minx=4&miny=52&maxx=5&maxy=53&status=Active
+```js
+const boreholes = await getBoreholes(map, { status: "completed" });
 ```
 
 ---
@@ -99,25 +98,7 @@ cd map-gis
 
 ---
 
-### 2. Backend setup
-
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
----
-
-### 3. Run backend
-
-```sh
-uvicorn app.main:app --reload
-```
-
----
-
-### 4. Frontend
+### 2. Run frontend
 
 Serve the frontend (example):
 
@@ -137,19 +118,15 @@ http://localhost:8000
 
 ```sh
 .
-├── backend
-│   ├── main.py
-│   ├── queries.py
-│   └── db.py
-├── frontend
-│   ├── index.html
-│   ├── js
-│   │   ├── main.js
-│   │   ├── api.js
-│   │   ├── map.js
-│   │   └── controls.js
-│   └── css
-│       └── style.css
+├── index.html
+├── js
+│   ├── main.js
+│   ├── api.js
+│   ├── mockGeoDB.js
+│   ├── map.js
+│   └── controls.js
+└── css
+    └── style.css
 ```
 
 ---
@@ -157,7 +134,7 @@ http://localhost:8000
 ## What I Learned
 
 * Designing **viewport-based GIS systems**
-* Optimizing spatial queries with PostGIS
+* Mocking backend contracts with local GeoJSON data
 * Managing async data flows in frontend apps
 * Separating concerns between UI, API, and database
 * Building scalable geospatial applications from scratch
@@ -172,4 +149,3 @@ http://localhost:8000
 * User authentication & saved views
 
 ---
-

@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const boreholesLayer = L.geoJSON(null, {
 pointToLayer: (feature, latlng) => {
 
-  const status = feature.properties.status;
+  const status = feature.properties.status?.toLowerCase();
 
   let color = '#2563eb'; // default (blue)
   let radius = 4;
 
-  if (status === "Active") {
+  if (status === "completed") {
     color = '#16a34a'; // green
     radius = 5;
-  } else if (status === "Abandoned") {
+  } else if (status === "abandoned") {
     color = '#d46868'; // red
     radius = 3;
-  } else if (status === "Suspended") {
+  } else if (status === "drilling") {
     color = '#f59e0b'; // orange
   }
 
@@ -94,7 +94,8 @@ pointToLayer: (feature, latlng) => {
         <div style="font-size:13px">
           <b>${feature.properties.name || "No name"}</b><br>
           <hr style="margin:4px 0;">
-          <b>License:</b> ${feature.properties.license || "N/A"}<br>
+          <b>Operator:</b> ${feature.properties.operator || "N/A"}<br>
+          <b>Area:</b> ${feature.properties.area_km2 || "N/A"} km2<br>
           <b>Status:</b> ${feature.properties.status || "Unknown"}
         </div>
       `);
@@ -226,13 +227,13 @@ const overlayMaps = {
 
   const statusEl = document.getElementById('uiStatus');
 
-  statusEl.textContent = currentStatus || "All";
+  statusEl.textContent = formatStatus(currentStatus) || "All";
 
-  if (currentStatus === "Active") {
+  if (currentStatus === "completed") {
     statusEl.style.color = "#16a34a"; // green
-  } else if (currentStatus === "Abandoned") {
+  } else if (currentStatus === "abandoned") {
     statusEl.style.color = "#dc2626"; // red
-  } else if (currentStatus === "Suspended") {
+  } else if (currentStatus === "drilling") {
     statusEl.style.color = "#f59e0b"; // orange
   } else {
     statusEl.style.color = "#000";
@@ -277,6 +278,10 @@ const overlayMaps = {
     }
   });
 
-  
+  function formatStatus(status) {
+    if (!status) return "";
+
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
 
 });
